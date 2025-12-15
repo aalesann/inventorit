@@ -1,0 +1,21 @@
+backend/node_modules
+backend/.env
+backend/.env.development
+backend/.env.production
+backend/logs
+backend/dist
+frontend/node_modules
+frontend/.env
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+
+# Uploaded files (avatars, etc.)
+uploads/
+
+# Build logs
+docker_build*
+frontend_build*
