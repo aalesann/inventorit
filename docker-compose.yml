@@ -1,23 +1,23 @@
 services:
   db:
-    image: postgres:15-alpine
+    build: ./db
+    image: alesandocker/inventorit-db:1.0.0
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgrespassword
       POSTGRES_DB: inventory_db
-    ports:
-      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
 
   backend:
     build: ./backend
+    image: alesandocker/inventorit-backend:1.0.0
     restart: always
     ports:
-      - "3000:3000"
+      - "3000"
     volumes:
-      - ./uploads:/app/uploads
+      - ./uploads:/app/backend/src/uploads
     environment:
       PORT: 3000
       SERVER_IP: ${SERVER_IP:-localhost}
@@ -33,15 +33,14 @@ services:
 
   frontend:
     build: ./frontend
+    image: alesandocker/inventorit-frontend:1.0.0
     restart: always
-    ports:
-      - "5173:80"
 
   nginx:
-    image: nginx:alpine
+    image: nginx:1.28-alpine
     restart: always
     ports:
-      - "0.0.0.0:80:80"
+      - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:

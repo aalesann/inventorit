@@ -34,10 +34,6 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
         `http://${SERVER_IP}`,
         `http://${SERVER_IP}:80`,
         `http://${SERVER_IP}:3000`,
-        'http://10.0.2.2',
-        'http://10.0.2.2:80',
-        'http://10.0.2.2:5173',
-        'http://10.0.2.2:3000'
     ];
 
 // Warn if using wildcard in production
@@ -63,7 +59,7 @@ const corsOptions: cors.CorsOptions = {
         }
     },
     credentials: true, // IMPORTANT: Enable credentials for cookies
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     exposedHeaders: ['Content-Range', 'X-Content-Range', 'Set-Cookie']
 };
@@ -132,7 +128,7 @@ sequelize.sync({ alter: true })
         // Create default admin user if it doesn't exist
         const admin = await User.findOne({ where: { username: 'admin' } });
         if (!admin) {
-            const defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'Adm1n$ecur3!2024';
+            const defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'Adm1n$ecur3!2025';
             await User.create({
                 username: 'admin',
                 email: 'admin@sistema.com',
