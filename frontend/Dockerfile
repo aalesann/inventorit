@@ -1,20 +1,13 @@
-# Build stage
-FROM node:22-alpine as build
-
+# ---- build stage ----
+FROM node:24-alpine3.23 AS build
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm install
-
+RUN npm ci
 COPY . .
 RUN npm run build
 
-# Production stage
-FROM nginx:alpine
-
+# ---- runtime stage (non-root) ----
+FROM nginxinc/nginx-unprivileged:1.27-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# Nginx unprivileged ya escucha típicamente en 8080
+EXPOSE 8080
