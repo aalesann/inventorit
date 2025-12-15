@@ -8,3 +8,6 @@ dist
 .gitignore
 README.md
 npm-debug.log*
+pnpm-lock.yaml
+yarn.lock
+yarn-error.log
