@@ -9,15 +9,18 @@ services:
       POSTGRES_DB: inventory_db
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d inventory_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: ./backend
     image: alesandocker/inventorit-backend:1.0.0
     restart: always
-    ports:
-      - "3000"
     volumes:
-      - ./uploads:/app/backend/src/uploads
+      - ./uploads:/app/uploads
     environment:
       PORT: 3000
       SERVER_IP: ${SERVER_IP:-localhost}
@@ -29,15 +32,18 @@ services:
       DB_NAME: inventory_db
       DB_PORT: 5432
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   frontend:
     build: ./frontend
     image: alesandocker/inventorit-frontend:1.0.0
     restart: always
+    expose:
+      - "8080"
 
   nginx:
-    image: nginx:1.28-alpine
+    image: nginx:1.28.0-alpine
     restart: always
     ports:
       - "80:80"
