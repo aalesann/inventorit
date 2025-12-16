@@ -26,7 +26,7 @@ Sistema completo de gestión de inventario de equipos informáticos con autentic
 ```bash
 # 1. Clonar el repositorio
 git clone <url-del-repositorio>
-cd sys-inventory
+cd inventorit
 
 # 2. El archivo .env ya está configurado para localhost
 # No necesitas modificar nada para desarrollo local
@@ -90,14 +90,19 @@ Para instrucciones detalladas de despliegue, consulta [DEPLOYMENT.md](DEPLOYMENT
 ## 📁 Estructura del Proyecto
 
 ```
-sys-inventory/
-├── backend/                 # API Node.js/Express
-│   ├── config/             # Configuración de BD
-│   ├── middleware/         # Middlewares (auth, errors)
-│   ├── models/             # Modelos Sequelize
-│   ├── routes/             # Rutas de la API
-│   ├── utils/              # Utilidades (logger)
-│   └── server.js           # Punto de entrada
+inventorit/
+├── backend/                 # API Node.js/Express (TypeScript)
+│   ├── src/
+│   │   ├── config/         # Configuración de BD
+│   │   ├── controllers/    # Controladores
+│   │   ├── middlewares/    # Middlewares (auth, errors)
+│   │   ├── models/         # Modelos Sequelize
+│   │   ├── routes/         # Rutas de la API
+│   │   ├── services/       # Servicios de negocio
+│   │   ├── utils/          # Utilidades (logger)
+│   │   └── server.ts       # Punto de entrada
+│   ├── dist/               # Código compilado (generado)
+│   └── Dockerfile
 ├── frontend/               # Aplicación React
 │   ├── src/
 │   └── Dockerfile
@@ -164,7 +169,7 @@ ALLOWED_ORIGINS=http://10.0.2.10,http://otro-servidor.com
 ## 🔐 Credenciales por Defecto
 
 - **Usuario**: `admin`
-- **Contraseña**: `Adm1n$ecur3!2024`
+- **Contraseña**: `Adm1n_Secur3!2025`
 
 ⚠️ **IMPORTANTE**: Cambiar inmediatamente en producción.
 

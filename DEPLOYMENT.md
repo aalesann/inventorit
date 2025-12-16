@@ -66,12 +66,12 @@ docker compose version
 ```bash
 # Si usas Git
 git clone <url-del-repositorio>
-cd sys-inventory
+cd inventorit
 
 # O copiar los archivos al servidor
-scp -r sys-inventory/ usuario@10.0.2.x:/opt/sys-inventory/
+scp -r inventorit/ usuario@10.0.2.x:/opt/inventorit/
 ssh usuario@10.0.2.x
-cd /opt/sys-inventory
+cd /opt/inventorit
 ```
 
 ### 2. Configurar Variables de Entorno
@@ -184,11 +184,11 @@ sudo docker compose ps
 
 Deberías ver algo como:
 ```
-NAME                    STATUS              PORTS
-sys-inventory-db-1      Up 2 minutes        0.0.0.0:5432->5432/tcp
-sys-inventory-backend-1 Up 2 minutes        0.0.0.0:3000->3000/tcp
-sys-inventory-frontend-1 Up 2 minutes       0.0.0.0:5173->80/tcp
-sys-inventory-nginx-1   Up 2 minutes        0.0.0.0:80->80/tcp
+NAME                       STATUS              PORTS
+inventorit-db-1            Up 2 minutes        5432/tcp
+inventorit-backend-1       Up 2 minutes        3000/tcp
+inventorit-frontend-1      Up 2 minutes        8080/tcp
+inventorit-nginx-1         Up 2 minutes        0.0.0.0:80->80/tcp
 ```
 
 ## Verificación
@@ -429,7 +429,7 @@ sudo docker compose exec frontend ls -la /usr/share/nginx/html
 El sistema crea un usuario administrador por defecto:
 
 - **Usuario**: `admin`
-- **Contraseña**: `Adm1n$ecur3!2025`
+- **Contraseña**: `Adm1n_Secur3!2025`
 
 **⚠️ IMPORTANTE**: Cambiar esta contraseña inmediatamente después del primer login en producción.
 
