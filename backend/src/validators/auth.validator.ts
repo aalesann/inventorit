@@ -9,7 +9,7 @@ export const loginSchema = z.object({
 // Register validation schema
 export const registerSchema = z.object({
     username: z.string().min(3, 'El nombre de usuario debe tener al menos 3 caracteres'),
-    email: z.string().email('Debe proporcionar un email válido'),
+    email: z.email('Debe proporcionar un email válido'),
     password: z.string()
         .min(8, 'La contraseña debe tener al menos 8 caracteres')
         .regex(/[A-Z]/, 'La contraseña debe contener al menos una letra mayúscula')
