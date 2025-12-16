@@ -97,17 +97,14 @@ sys-inventory/
 │   ├── models/             # Modelos Sequelize
 │   ├── routes/             # Rutas de la API
 │   ├── utils/              # Utilidades (logger)
-│   ├── .env.example        # Variables de entorno ejemplo
-│   ├── .env.development    # Config desarrollo
-│   ├── .env.production     # Config producción
 │   └── server.js           # Punto de entrada
 ├── frontend/               # Aplicación React
 │   ├── src/
 │   └── Dockerfile
 ├── nginx/                  # Configuración NGINX
 │   └── nginx.conf
-├── .env                    # Variables Docker Compose
-├── .env.example            # Ejemplo variables
+├── .env                    # Variables de entorno (NO versionar)
+├── .env.example            # Plantilla de variables
 ├── docker-compose.yml      # Orquestación servicios
 ├── DEPLOYMENT.md           # Guía de despliegue
 └── README.md              # Este archivo
@@ -117,12 +114,40 @@ sys-inventory/
 
 ### Variables de Entorno
 
-#### Archivo `.env` (raíz del proyecto)
+Todas las variables de entorno se configuran en un **único archivo `.env`** ubicado en la raíz del proyecto.
+
+#### Configuración Inicial
+
 ```bash
-SERVER_IP=10.0.2.10  # IP del servidor (localhost para desarrollo)
-ALLOWED_ORIGINS=           # Orígenes CORS permitidos (opcional)
-NODE_ENV=production        # development o production
+# Copiar el archivo de ejemplo
+cp .env.example .env
+
+# Editar con tus valores
+nano .env  # o tu editor preferido
 ```
+
+#### Variables Principales
+
+**Servidor y Red:**
+- `SERVER_IP`: IP del servidor (localhost para desarrollo, IP real para producción)
+- `ALLOWED_ORIGINS`: Orígenes CORS permitidos (opcional, separados por comas)
+- `NODE_ENV`: Entorno de ejecución (development | production)
+- `PORT`: Puerto del backend (default: 3000)
+
+**Base de Datos:**
+- `DB_HOST`: Host de PostgreSQL (default: db)
+- `DB_PORT`: Puerto de PostgreSQL (default: 5432)
+- `DB_NAME`: Nombre de la base de datos
+- `DB_USER`: Usuario de PostgreSQL
+- `DB_PASSWORD`: Contraseña de PostgreSQL ⚠️ **Cambiar en producción**
+
+**Seguridad:**
+- `JWT_SECRET`: Secreto para firmar tokens ⚠️ **Cambiar en producción**
+- `JWT_ACCESS_EXPIRATION`: Duración del access token (default: 15m)
+- `JWT_REFRESH_EXPIRATION`: Duración del refresh token (default: 7d)
+- `DEFAULT_ADMIN_PASSWORD`: Contraseña del admin por defecto ⚠️ **Cambiar después del primer login**
+- `MAX_LOGIN_ATTEMPTS`: Intentos de login permitidos (default: 5)
+- `BLOCK_DURATION_MINUTES`: Minutos de bloqueo tras intentos fallidos (default: 15)
 
 #### Configuración Automática de CORS
 
@@ -130,7 +155,6 @@ Si `ALLOWED_ORIGINS` está vacío, el sistema automáticamente permite:
 - `http://${SERVER_IP}`
 - `http://${SERVER_IP}:80`
 - `http://${SERVER_IP}:3000`
-- `http://localhost` (siempre en desarrollo)
 
 Para múltiples orígenes específicos:
 ```bash
@@ -251,7 +275,7 @@ Ver [DEPLOYMENT.md](DEPLOYMENT.md) para más soluciones.
 ## 📚 Documentación
 
 - [Guía de Despliegue Completa](DEPLOYMENT.md)
-- [Configuración de Variables de Entorno](backend/.env.example)
+- [Configuración de Variables de Entorno](.env.example)
 
 ## 🤝 Contribuir
 

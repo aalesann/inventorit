@@ -1,13 +1,12 @@
+# Backend
 backend/node_modules
-backend/.env
-backend/.env.development
-backend/.env.production
 backend/logs
 backend/dist
-frontend/node_modules
-frontend/.env
 
-# Environment files
+# Frontend
+frontend/node_modules
+
+# Environment files (centralized in root)
 .env
 .env.local
 .env.development

@@ -76,52 +76,89 @@ cd /opt/sys-inventory
 
 ### 2. Configurar Variables de Entorno
 
+**IMPORTANTE**: Todas las variables de entorno se configuran en un **único archivo `.env`** ubicado en la raíz del proyecto.
+
 #### Para Desarrollo Local
 ```bash
 # Copiar el archivo de ejemplo
 cp .env.example .env
 
-# El archivo .env ya está configurado para localhost
+# El archivo .env.example ya tiene valores por defecto para desarrollo
+# Puedes usarlo tal cual o personalizarlo
 ```
 
-#### Para Servidor On-Premise
+#### Para Servidor On-Premise (Producción)
 ```bash
-# Crear archivo .env con la IP del servidor
-cat > .env << EOF
+# Copiar el archivo de ejemplo
+cp .env.example .env
+
+# Editar el archivo .env con tus valores de producción
+nano .env
+```
+
+**Ejemplo de configuración para producción:**
+```bash
+# ==============================================
+# ENVIRONMENT CONFIGURATION
+# ==============================================
+NODE_ENV=production
+
+# ==============================================
+# SERVER CONFIGURATION
+# ==============================================
 SERVER_IP=10.0.2.x
 ALLOWED_ORIGINS=
-NODE_ENV=production
-EOF
+PORT=3000
+
+# ==============================================
+# DATABASE CONFIGURATION
+# ==============================================
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=inventory_db
+DB_USER=postgres
+DB_PASSWORD=TU_PASSWORD_SEGURO_AQUI
+
+# ==============================================
+# JWT CONFIGURATION
+# ==============================================
+# Generar con: openssl rand -base64 32
+JWT_SECRET=TU_JWT_SECRET_AQUI
+JWT_ACCESS_EXPIRATION=15m
+JWT_REFRESH_EXPIRATION=7d
+
+# ==============================================
+# SECURITY CONFIGURATION
+# ==============================================
+DEFAULT_ADMIN_PASSWORD=TU_PASSWORD_ADMIN_SEGURO
+MAX_LOGIN_ATTEMPTS=5
+BLOCK_DURATION_MINUTES=15
 ```
 
-**Explicación de las variables:**
+### 3. Generar Secretos de Seguridad (IMPORTANTE para Producción)
 
-- `SERVER_IP`: La IP del servidor on-premise (ej: `10.0.2.x`)
-  - En desarrollo: `localhost`
-  - En producción: La IP real del servidor
+```bash
+# Generar un JWT secret seguro
+openssl rand -base64 32
 
-- `ALLOWED_ORIGINS`: (Opcional) Lista de orígenes permitidos para CORS, separados por comas
-  - Dejar vacío para usar configuración automática basada en `SERVER_IP`
-  - Ejemplo: `http://10.0.2.x,http://10.0.2.x:80,http://otro-servidor.com`
-  - Para permitir todos (NO RECOMENDADO): `*`
+# Copiar el resultado y agregarlo a tu archivo .env
+# JWT_SECRET=<resultado_del_comando>
+```
 
-- `NODE_ENV`: Entorno de ejecución
-  - `development`: Para desarrollo local
-  - `production`: Para servidor de producción
+### 4. Configuración de Seguridad Adicional (Opcional)
 
-### 3. Configuración de Seguridad (Recomendado para Producción)
+Si deseas personalizar los límites de seguridad, edita las siguientes variables en `.env`:
 
-Editar `docker-compose.yml` y cambiar las contraseñas por defecto:
+```bash
+# Intentos de login antes de bloquear
+MAX_LOGIN_ATTEMPTS=5
 
-```yaml
-services:
-  db:
-    environment:
-      POSTGRES_PASSWORD: TU_PASSWORD_SEGURO_AQUI
-  
-  backend:
-    environment:
-      DB_PASSWORD: TU_PASSWORD_SEGURO_AQUI
+# Minutos de bloqueo tras intentos fallidos
+BLOCK_DURATION_MINUTES=15
+
+# Duración de los tokens
+JWT_ACCESS_EXPIRATION=15m
+JWT_REFRESH_EXPIRATION=7d
 ```
 
 ## Despliegue

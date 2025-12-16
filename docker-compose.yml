@@ -3,14 +3,16 @@ services:
     build: ./db
     image: alesandocker/inventorit-db:1.0.0
     restart: always
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
-      POSTGRES_DB: inventory_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d inventory_db" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -19,18 +21,10 @@ services:
     build: ./backend
     image: alesandocker/inventorit-backend:1.0.0
     restart: always
+    env_file:
+      - .env
     volumes:
       - ./uploads:/app/uploads
-    environment:
-      PORT: 3000
-      SERVER_IP: ${SERVER_IP:-localhost}
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
-      NODE_ENV: ${NODE_ENV:-development}
-      DB_HOST: db
-      DB_USER: postgres
-      DB_PASSWORD: postgrespassword
-      DB_NAME: inventory_db
-      DB_PORT: 5432
     depends_on:
       db:
         condition: service_healthy
