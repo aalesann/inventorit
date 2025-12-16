@@ -1,12 +1,12 @@
 # -------- deps --------
-FROM node:24-alpine3.23 AS deps
+FROM node:20-alpine3.23 AS deps
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm ci
 
 # -------- build --------
-FROM node:24-alpine3.23 AS build
+FROM node:20-alpine3.23 AS build
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
@@ -14,7 +14,7 @@ COPY . .
 RUN npm run build
 
 # -------- runtime (prod only + non-root) --------
-FROM node:24-alpine3.23 AS runner
+FROM node:20-alpine3.23 AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
