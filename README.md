@@ -19,44 +19,187 @@ Sistema completo de gestión de inventario de equipos informáticos con autentic
 - 4 GB RAM mínimo
 - 20 GB espacio en disco
 
-## 🏃 Quick Start
+## 🚀 Instalación y Despliegue
 
-### Desarrollo Local
+### 1. Clonar el Repositorio
 
 ```bash
-# 1. Clonar el repositorio
 git clone <url-del-repositorio>
 cd inventorit
-
-# 2. El archivo .env ya está configurado para localhost
-# No necesitas modificar nada para desarrollo local
-
-# 3. Construir e iniciar los servicios
-docker compose up -d
-
-# 4. Acceder a la aplicación
-# Frontend: http://localhost
-# Backend API: http://localhost/api/
 ```
 
-### Despliegue en Servidor On-Premise
+### 2. Configurar Variables de Entorno
+
+Todas las variables de entorno se configuran en un **único archivo `.env`** ubicado en la raíz del proyecto.
 
 ```bash
-# 1. Configurar la IP del servidor
-cat > .env << EOF
-SERVER_IP=10.0.2.10
-ALLOWED_ORIGINS=
-NODE_ENV=production
-EOF
+# Copiar el archivo de ejemplo
+cp .env.example .env
 
-# 2. Construir e iniciar
-docker compose up -d
-
-# 3. Acceder desde cualquier máquina en la red
-# http://10.0.2.10
+# Editar con tus valores
+nano .env  # o tu editor preferido
 ```
 
-Para instrucciones detalladas de despliegue, consulta [DEPLOYMENT.md](DEPLOYMENT.md).
+#### Configuración para Desarrollo Local
+
+El archivo `.env.example` ya tiene valores por defecto para desarrollo. Puedes usarlo tal cual:
+
+```bash
+NODE_ENV=development
+SERVER_IP=localhost
+ALLOWED_ORIGINS=
+PORT=3000
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=inventory_db
+DB_USER=postgres
+DB_PASSWORD=your_secure_db_password_here
+JWT_SECRET=your_jwt_secret_key_here_change_in_production
+JWT_ACCESS_EXPIRATION=15m
+JWT_REFRESH_EXPIRATION=7d
+DEFAULT_ADMIN_PASSWORD=Adm1n_Secur3!2025
+MAX_LOGIN_ATTEMPTS=5
+BLOCK_DURATION_MINUTES=15
+```
+
+#### Configuración para Producción
+
+Para despliegue en servidor on-premise, edita el archivo `.env`:
+
+```bash
+NODE_ENV=production
+SERVER_IP=10.0.2.x  # IP real del servidor
+ALLOWED_ORIGINS=    # Dejar vacío para auto-configuración
+PORT=3000
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=inventory_db
+DB_USER=postgres
+DB_PASSWORD=TU_PASSWORD_SEGURO_AQUI  # ⚠️ Cambiar
+JWT_SECRET=TU_JWT_SECRET_AQUI        # ⚠️ Generar con: openssl rand -base64 32
+JWT_ACCESS_EXPIRATION=15m
+JWT_REFRESH_EXPIRATION=7d
+DEFAULT_ADMIN_PASSWORD=TU_PASSWORD_ADMIN_SEGURO  # ⚠️ Cambiar
+MAX_LOGIN_ATTEMPTS=5
+BLOCK_DURATION_MINUTES=15
+```
+
+> **💡 Tip**: Genera un JWT secret seguro con: `openssl rand -base64 32`
+
+#### Variables de Entorno Explicadas
+
+**Servidor y Red:**
+- `SERVER_IP`: IP del servidor (localhost para desarrollo, IP real para producción)
+- `ALLOWED_ORIGINS`: Orígenes CORS permitidos (opcional, separados por comas)
+- `NODE_ENV`: Entorno de ejecución (development | production)
+- `PORT`: Puerto del backend (default: 3000)
+
+**Base de Datos:**
+- `DB_HOST`: Host de PostgreSQL (default: db)
+- `DB_PORT`: Puerto de PostgreSQL (default: 5432)
+- `DB_NAME`: Nombre de la base de datos
+- `DB_USER`: Usuario de PostgreSQL
+- `DB_PASSWORD`: Contraseña de PostgreSQL
+
+**Seguridad:**
+- `JWT_SECRET`: Secreto para firmar tokens
+- `JWT_ACCESS_EXPIRATION`: Duración del access token (default: 15m)
+- `JWT_REFRESH_EXPIRATION`: Duración del refresh token (default: 7d)
+- `DEFAULT_ADMIN_PASSWORD`: Contraseña del admin por defecto
+- `MAX_LOGIN_ATTEMPTS`: Intentos de login permitidos (default: 5)
+- `BLOCK_DURATION_MINUTES`: Minutos de bloqueo tras intentos fallidos (default: 15)
+
+**Configuración Automática de CORS:**
+
+Si `ALLOWED_ORIGINS` está vacío, el sistema automáticamente permite:
+- `http://${SERVER_IP}`
+- `http://${SERVER_IP}:80`
+- `http://${SERVER_IP}:3000`
+
+Para múltiples orígenes específicos:
+```bash
+ALLOWED_ORIGINS=http://10.0.2.10,http://otro-servidor.com
+```
+
+### 3. Iniciar los Servicios
+
+```bash
+# Construir e iniciar en segundo plano
+docker compose up -d
+
+# O ver logs en tiempo real
+docker compose up
+```
+
+### 4. Verificar el Despliegue
+
+```bash
+# Ver estado de los servicios
+docker compose ps
+
+# Deberías ver algo como:
+# NAME                       STATUS              PORTS
+# inventorit-db-1            Up 2 minutes        5432/tcp
+# inventorit-backend-1       Up 2 minutes        3000/tcp
+# inventorit-frontend-1      Up 2 minutes        8080/tcp
+# inventorit-nginx-1         Up 2 minutes        0.0.0.0:80->80/tcp
+```
+
+### 5. Acceder a la Aplicación
+
+- **Desarrollo local**: http://localhost
+- **Servidor on-premise**: http://10.0.2.x (usar la IP configurada)
+- **API Backend**: http://localhost/api/
+
+## 🔐 Credenciales por Defecto
+
+- **Usuario**: `admin`
+- **Contraseña**: `Adm1n_Secur3!2025`
+
+⚠️ **IMPORTANTE**: Cambiar inmediatamente después del primer login en producción.
+
+## 🌐 Configuración de Red (Producción)
+
+Para acceder desde otras máquinas en la red:
+
+### 1. Configurar IP Estática
+
+Asigna una IP estática al servidor en tu red local (ej: 10.0.2.10)
+
+### 2. Configurar Firewall
+
+**Linux (Ubuntu/Debian):**
+```bash
+# Permitir tráfico HTTP
+sudo ufw allow 80/tcp
+
+# Habilitar firewall
+sudo ufw enable
+
+# Verificar estado
+sudo ufw status
+```
+
+**Windows Server:**
+```powershell
+# Abrir PowerShell como Administrador
+New-NetFirewallRule -DisplayName "Allow HTTP" -Direction Inbound -LocalPort 80 -Protocol TCP -Action Allow
+```
+
+### 3. Actualizar Configuración
+
+Edita el archivo `.env` con la IP del servidor:
+```bash
+SERVER_IP=10.0.2.10
+NODE_ENV=production
+```
+
+### 4. Reiniciar Servicios
+
+```bash
+docker compose down
+docker compose up -d
+```
 
 ## 🏗️ Arquitectura
 
@@ -111,73 +254,16 @@ inventorit/
 ├── .env                    # Variables de entorno (NO versionar)
 ├── .env.example            # Plantilla de variables
 ├── docker-compose.yml      # Orquestación servicios
-├── DEPLOYMENT.md           # Guía de despliegue
 └── README.md              # Este archivo
 ```
-
-## 🔧 Configuración
-
-### Variables de Entorno
-
-Todas las variables de entorno se configuran en un **único archivo `.env`** ubicado en la raíz del proyecto.
-
-#### Configuración Inicial
-
-```bash
-# Copiar el archivo de ejemplo
-cp .env.example .env
-
-# Editar con tus valores
-nano .env  # o tu editor preferido
-```
-
-#### Variables Principales
-
-**Servidor y Red:**
-- `SERVER_IP`: IP del servidor (localhost para desarrollo, IP real para producción)
-- `ALLOWED_ORIGINS`: Orígenes CORS permitidos (opcional, separados por comas)
-- `NODE_ENV`: Entorno de ejecución (development | production)
-- `PORT`: Puerto del backend (default: 3000)
-
-**Base de Datos:**
-- `DB_HOST`: Host de PostgreSQL (default: db)
-- `DB_PORT`: Puerto de PostgreSQL (default: 5432)
-- `DB_NAME`: Nombre de la base de datos
-- `DB_USER`: Usuario de PostgreSQL
-- `DB_PASSWORD`: Contraseña de PostgreSQL ⚠️ **Cambiar en producción**
-
-**Seguridad:**
-- `JWT_SECRET`: Secreto para firmar tokens ⚠️ **Cambiar en producción**
-- `JWT_ACCESS_EXPIRATION`: Duración del access token (default: 15m)
-- `JWT_REFRESH_EXPIRATION`: Duración del refresh token (default: 7d)
-- `DEFAULT_ADMIN_PASSWORD`: Contraseña del admin por defecto ⚠️ **Cambiar después del primer login**
-- `MAX_LOGIN_ATTEMPTS`: Intentos de login permitidos (default: 5)
-- `BLOCK_DURATION_MINUTES`: Minutos de bloqueo tras intentos fallidos (default: 15)
-
-#### Configuración Automática de CORS
-
-Si `ALLOWED_ORIGINS` está vacío, el sistema automáticamente permite:
-- `http://${SERVER_IP}`
-- `http://${SERVER_IP}:80`
-- `http://${SERVER_IP}:3000`
-
-Para múltiples orígenes específicos:
-```bash
-ALLOWED_ORIGINS=http://10.0.2.10,http://otro-servidor.com
-```
-
-## 🔐 Credenciales por Defecto
-
-- **Usuario**: `admin`
-- **Contraseña**: `Adm1n_Secur3!2025`
-
-⚠️ **IMPORTANTE**: Cambiar inmediatamente en producción.
 
 ## 📡 API Endpoints
 
 ### Autenticación
 - `POST /api/auth/register` - Registrar usuario
 - `POST /api/auth/login` - Iniciar sesión
+- `POST /api/auth/refresh` - Renovar token
+- `POST /api/auth/logout` - Cerrar sesión
 
 ### Usuarios
 - `GET /api/users` - Listar usuarios (admin)
@@ -196,91 +282,126 @@ ALLOWED_ORIGINS=http://10.0.2.10,http://otro-servidor.com
 - `PUT /api/inventory/:id` - Actualizar activo
 - `DELETE /api/inventory/:id` - Eliminar activo
 
-## 🧪 Verificación
-
-```bash
-# Verificar que todos los servicios están corriendo
-docker compose ps
-
-# Ver logs
-docker compose logs -f backend
-
-# Probar la API
-curl http://localhost/api/
-
-# Verificar CORS
-curl -H "Origin: http://10.0.2.10" \
-     -H "Access-Control-Request-Method: POST" \
-     -X OPTIONS \
-     http://localhost/api/auth/login -v
-```
+### Reportes
+- `GET /api/reportes` - Generar reportes
 
 ## 🛠️ Comandos Útiles
 
 ```bash
+# Ver logs
+docker compose logs -f backend
+docker compose logs -f
+
 # Detener servicios
 docker compose down
 
 # Reiniciar un servicio
 docker compose restart backend
 
-# Ver logs en tiempo real
-docker compose logs -f
-
 # Reconstruir imágenes
 docker compose build --no-cache
+docker compose up -d --build
 
 # Backup de base de datos
 docker compose exec db pg_dump -U postgres inventory_db > backup.sql
 
 # Restaurar base de datos
 docker compose exec -T db psql -U postgres inventory_db < backup.sql
+
+# Ver estado de los servicios
+docker compose ps
+
+# Ver uso de recursos
+docker stats
 ```
 
-## 🌐 Acceso desde la Red
+## 🧪 Verificación
 
-Para acceder desde otras máquinas:
+### Probar la API
 
-1. **Configurar IP estática** en el servidor
-2. **Actualizar `.env`** con la IP correcta
-3. **Configurar firewall** para permitir puerto 80
-4. **Reiniciar servicios**: `docker compose restart`
+```bash
+# Verificar que el backend está corriendo
+curl http://localhost/api/
 
-Ver [DEPLOYMENT.md](DEPLOYMENT.md) para detalles.
+# Deberías recibir: "Inventory API is running"
+```
+
+### Verificar CORS
+
+```bash
+curl -H "Origin: http://10.0.2.10" \
+     -H "Access-Control-Request-Method: POST" \
+     -H "Access-Control-Request-Headers: Content-Type" \
+     -X OPTIONS \
+     http://localhost/api/auth/login -v
+
+# Deberías ver headers como:
+# Access-Control-Allow-Origin: http://10.0.2.10
+# Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS
+# Access-Control-Allow-Credentials: true
+```
 
 ## 🐛 Troubleshooting
 
-### CORS Error
+### Error de CORS
+
 ```bash
 # Verificar configuración CORS en logs
 docker compose logs backend | grep CORS
 
-# Actualizar ALLOWED_ORIGINS si es necesario
+# Actualizar ALLOWED_ORIGINS en .env si es necesario
+# Reiniciar servicios
+docker compose restart backend
 ```
 
-### No puede conectar a la BD
+### No puede conectar a la Base de Datos
+
 ```bash
 # Verificar que la BD está corriendo
 docker compose ps db
+
+# Ver logs de la base de datos
+docker compose logs db
 
 # Reiniciar BD
 docker compose restart db
 ```
 
-### Puerto en uso
+### Puerto 80 en Uso
+
 ```bash
-# Ver qué proceso usa el puerto 80
+# Ver qué proceso usa el puerto 80 (Linux)
 sudo lsof -i :80
 
+# Windows
+netstat -ano | findstr :80
+
 # Cambiar puerto en docker-compose.yml si es necesario
+# O detener el proceso que está usando el puerto
 ```
 
-Ver [DEPLOYMENT.md](DEPLOYMENT.md) para más soluciones.
+### Backend no puede conectar a la BD
 
-## 📚 Documentación
+```bash
+# Verificar conectividad desde el backend
+docker compose exec backend ping db
 
-- [Guía de Despliegue Completa](DEPLOYMENT.md)
-- [Configuración de Variables de Entorno](.env.example)
+# Verificar variables de entorno
+docker compose exec backend env | grep DB_
+```
+
+### Frontend muestra página en blanco
+
+```bash
+# Ver logs del frontend
+docker compose logs frontend
+
+# Ver logs de NGINX
+docker compose logs nginx
+
+# Verificar que el frontend se construyó correctamente
+docker compose exec frontend ls -la /usr/share/nginx/html
+```
 
 ## 🤝 Contribuir
 
@@ -297,6 +418,6 @@ Este proyecto está bajo la Licencia MIT.
 ## 👥 Soporte
 
 Para problemas o preguntas:
-1. Revisar [DEPLOYMENT.md](DEPLOYMENT.md)
+1. Revisar la sección de [Troubleshooting](#-troubleshooting)
 2. Verificar logs: `docker compose logs`
 3. Abrir un issue en el repositorio
