@@ -109,17 +109,7 @@ BLOCK_DURATION_MINUTES=15
 - `MAX_LOGIN_ATTEMPTS`: Intentos de login permitidos (default: 5)
 - `BLOCK_DURATION_MINUTES`: Minutos de bloqueo tras intentos fallidos (default: 15)
 
-**Configuración Automática de CORS:**
 
-Si `ALLOWED_ORIGINS` está vacío, el sistema automáticamente permite:
-- `http://${SERVER_IP}`
-- `http://${SERVER_IP}:80`
-- `http://${SERVER_IP}:3000`
-
-Para múltiples orígenes específicos:
-```bash
-ALLOWED_ORIGINS=http://10.0.2.10,http://otro-servidor.com
-```
 
 ### 3. Iniciar los Servicios
 
@@ -158,48 +148,7 @@ docker compose ps
 
 ⚠️ **IMPORTANTE**: Cambiar inmediatamente después del primer login en producción.
 
-## 🌐 Configuración de Red (Producción)
 
-Para acceder desde otras máquinas en la red:
-
-### 1. Configurar IP Estática
-
-Asigna una IP estática al servidor en tu red local (ej: 10.0.2.10)
-
-### 2. Configurar Firewall
-
-**Linux (Ubuntu/Debian):**
-```bash
-# Permitir tráfico HTTP
-sudo ufw allow 80/tcp
-
-# Habilitar firewall
-sudo ufw enable
-
-# Verificar estado
-sudo ufw status
-```
-
-**Windows Server:**
-```powershell
-# Abrir PowerShell como Administrador
-New-NetFirewallRule -DisplayName "Allow HTTP" -Direction Inbound -LocalPort 80 -Protocol TCP -Action Allow
-```
-
-### 3. Actualizar Configuración
-
-Edita el archivo `.env` con la IP del servidor:
-```bash
-SERVER_IP=10.0.2.10
-NODE_ENV=production
-```
-
-### 4. Reiniciar Servicios
-
-```bash
-docker compose down
-docker compose up -d
-```
 
 ## 🏗️ Arquitectura
 
@@ -326,33 +275,11 @@ curl http://localhost/api/
 # Deberías recibir: "Inventory API is running"
 ```
 
-### Verificar CORS
 
-```bash
-curl -H "Origin: http://10.0.2.10" \
-     -H "Access-Control-Request-Method: POST" \
-     -H "Access-Control-Request-Headers: Content-Type" \
-     -X OPTIONS \
-     http://localhost/api/auth/login -v
-
-# Deberías ver headers como:
-# Access-Control-Allow-Origin: http://10.0.2.10
-# Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS
-# Access-Control-Allow-Credentials: true
-```
 
 ## 🐛 Troubleshooting
 
-### Error de CORS
 
-```bash
-# Verificar configuración CORS en logs
-docker compose logs backend | grep CORS
-
-# Actualizar ALLOWED_ORIGINS en .env si es necesario
-# Reiniciar servicios
-docker compose restart backend
-```
 
 ### No puede conectar a la Base de Datos
 
@@ -403,21 +330,6 @@ docker compose logs nginx
 docker compose exec frontend ls -la /usr/share/nginx/html
 ```
 
-## 🤝 Contribuir
-
-1. Fork el proyecto
-2. Crear rama feature (`git checkout -b feature/AmazingFeature`)
-3. Commit cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir Pull Request
-
 ## 📝 Licencia
 
 Este proyecto está bajo la Licencia MIT.
-
-## 👥 Soporte
-
-Para problemas o preguntas:
-1. Revisar la sección de [Troubleshooting](#-troubleshooting)
-2. Verificar logs: `docker compose logs`
-3. Abrir un issue en el repositorio

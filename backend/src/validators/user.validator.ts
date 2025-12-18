@@ -10,7 +10,7 @@ const passwordSchema = z.string()
 // Create user validation schema
 export const createUserSchema = z.object({
     username: z.string().min(3, 'El nombre de usuario debe tener al menos 3 caracteres'),
-    email: z.string().email('Debe proporcionar un email válido'),
+    email: z.email('Debe proporcionar un email válido'),
     password: passwordSchema,
     role: z.enum(['admin', 'user']).optional()
 });
@@ -18,7 +18,7 @@ export const createUserSchema = z.object({
 // Update user validation schema
 export const updateUserSchema = z.object({
     username: z.string().min(3, 'El nombre de usuario debe tener al menos 3 caracteres').optional(),
-    email: z.string().email('Debe proporcionar un email válido').optional(),
+    email: z.email('Debe proporcionar un email válido').optional(),
     password: passwordSchema.optional(),
     role: z.enum(['admin', 'user']).optional()
 });
